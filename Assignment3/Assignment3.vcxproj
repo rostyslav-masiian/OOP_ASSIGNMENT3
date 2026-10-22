@@ -143,6 +143,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Assignment3.cpp" />
+    <ClCompile Include="BotTank.cpp" />
+    <ClCompile Include="GameEngine.cpp" />
+    <ClCompile Include="GameMap.cpp" />
+    <ClCompile Include="PlayerTank.cpp" />
+    <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="Tank.cpp" />
+    <ClCompile Include="Wall.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BotTank.h" />
+    <ClInclude Include="GameEngine.h" />
+    <ClInclude Include="GameMap.h" />
+    <ClInclude Include="PlayerTank.h" />
+    <ClInclude Include="Projectile.h" />
+    <ClInclude Include="Tank.h" />
+    <ClInclude Include="Vector2D.h" />
+    <ClInclude Include="Wall.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

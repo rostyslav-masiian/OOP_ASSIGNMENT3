@@ -1,0 +1,9 @@
+#pragma once
+#include "Tank.h"
+class PlayerTank : public Tank
+{
+public:
+	using Tank::Tank;
+	void move(const std::vector<Wall>& walls, const GameMap& gameMap) override;
+};
+
