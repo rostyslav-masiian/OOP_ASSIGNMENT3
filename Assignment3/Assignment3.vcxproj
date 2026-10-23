@@ -144,6 +144,8 @@
   <ItemGroup>
     <ClCompile Include="Assignment3.cpp" />
     <ClCompile Include="BotTank.cpp" />
+    <ClCompile Include="BoxCollider.cpp" />
+    <ClCompile Include="CircleCollider.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameMap.cpp" />
     <ClCompile Include="PlayerTank.cpp" />
@@ -153,6 +155,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BotTank.h" />
+    <ClInclude Include="BoxCollider.h" />
+    <ClInclude Include="CircleCollider.h" />
+    <ClInclude Include="Collider.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameMap.h" />
     <ClInclude Include="PlayerTank.h" />

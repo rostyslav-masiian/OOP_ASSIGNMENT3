@@ -6,6 +6,10 @@ Wall::Wall(int gridX, int gridY, float tileSize)
 
 int Wall::getHealth() const { return health; }
 Vector2D Wall::getPosition() const { return position; }
+BoxCollider Wall::getCollider() const
+{
+    return BoxCollider(position, width, height);
+}
 
 void Wall::takeDamage(int amount) 
 {

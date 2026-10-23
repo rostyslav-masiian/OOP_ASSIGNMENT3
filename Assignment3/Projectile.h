@@ -1,6 +1,6 @@
 #pragma once
 #include "Vector2D.h"
-
+#include "CircleCollider.h"
 
 class Tank;
 
@@ -26,6 +26,7 @@ public:
 	float getRadius() const;
 	int getDamage() const;
 	float getSpeed() const;
+	CircleCollider getCollider() const;
 
 };
 

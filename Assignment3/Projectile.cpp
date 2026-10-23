@@ -12,6 +12,8 @@ float Projectile::getRadius() const { return radius; }
 float Projectile::getSpeed() const { return speed; }
 bool Projectile::isExpired() { return lifespan <= 0; }
 
+CircleCollider Projectile::getCollider() const { return CircleCollider(projCenter, radius); }
+
 void Projectile::move(float dt)
 {
 	projCenter.setX(projCenter.getX() + direction.getX() * speed * dt);

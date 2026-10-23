@@ -26,6 +26,12 @@ GameMap::GameMap(int width = 20, int height = 20, float titleSize = 10.0f, int m
 	}
 }
 
+int GameMap::getHeight() const { return height; }
+int GameMap::getWidth() const { return width; }
+float GameMap::getTileSize() const { return tileSize; }
+
+
+
 bool GameMap::isMudZone(Vector2D position) const
 {
 	int tileX = static_cast<int>(position.getX() / tileSize);

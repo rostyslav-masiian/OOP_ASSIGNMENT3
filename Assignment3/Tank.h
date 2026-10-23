@@ -3,7 +3,8 @@
 #include "Projectile.h"
 #include "Wall.h"
 #include "GameMap.h"
-
+#include "BoxCollider.h"
+#include <algorithm>
 #include <memory>
 #include "vector"
 
@@ -27,7 +28,7 @@ public:
 	bool canFire();
 	void updateCooldown(float dt);
 	void resetCooldown();
-
+	BoxCollider getCollider() const;
 	Projectile fire();
 	virtual void move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap) = 0;
 	virtual ~Tank() = default;
