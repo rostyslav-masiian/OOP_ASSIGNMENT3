@@ -1,15 +1,23 @@
 #pragma once
 #include <vector>
 
-enum TerrainType
+#include "Vector2D.h"
+
+enum TileType
 {
 	Ground, 
 	Mud
 };
 class GameMap
 {
-	protected:
-		int size;
-		std::vector<TerrainType> terrain;
+protected:
+	int width = 20;
+	int height = 20;
+	float tileSize = 10.0f;
+	std::vector< std::vector<TileType>> grid;
+public:
+	GameMap(int width = 20, int height = 20, float titleSize = 10.0f, int mudPercentage = 15);
+	bool isMudZone(Vector2D position) const;
+	float getSpeedModifier(Vector2D position) const;
 };
 
