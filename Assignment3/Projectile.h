@@ -7,9 +7,9 @@ class Tank;
 class Projectile
 {
 protected:
-	int damage = 10;
-	float speed = 7;
-	float radius = 1;
+	int damage = 34;
+	float speed = 200;
+	float radius = 8;
 	float lifespan = 10;
 	bool destroyed = false;
 
@@ -19,7 +19,7 @@ protected:
 	
 
 public:
-	Projectile(Vector2D direction, Vector2D projCenter, Tank* owner);
+	Projectile(Vector2D projCenter, Vector2D direction, Tank* owner);
 	void move(float dt);
 	Vector2D getCenter() const;
 	float getRadius() const;

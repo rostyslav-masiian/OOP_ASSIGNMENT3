@@ -1,8 +1,8 @@
 #include "Projectile.h"
 #include "Tank.h"
 
-Projectile::Projectile(Vector2D direction, Vector2D projCenter, Tank* owner) 
-	: direction(direction), projCenter(projCenter), owner(owner) {}
+Projectile::Projectile(Vector2D projCenter, Vector2D direction, Tank* owner)
+	: projCenter(projCenter), direction(direction), owner(owner) {}
 
 
 Vector2D Projectile::getCenter() const { return projCenter; }

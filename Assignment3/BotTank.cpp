@@ -7,8 +7,15 @@
 #include <algorithm>
 #include <random>
 
+
+BotTank::BotTank(Vector2D startPos, float speed, int health)
+    : Tank(startPos, speed, health) {}
+
 BotState BotTank::getBotState() const { return botState; }
 bool BotTank::isAlive() const { return health > 0; }
+
+
+
 
 bool BotTank::isSegmentIntersectingBox(const Vector2D& p1, const Vector2D& p2, const BoxCollider& box)
 {
@@ -76,7 +83,10 @@ static Vector2D getRandomDirection()
         Vector2D(1.0f, 0.0f)   
     };
 
-    static std::mt19937 rng(std::random_device{}());
+    
+    std::random_device rd;
+    static std::mt19937 rng{ rd() };
+
     std::uniform_int_distribution<size_t> dist(0, directions.size() - 1);
 
     return directions[dist(rng)];
@@ -84,123 +94,112 @@ static Vector2D getRandomDirection()
 
 void BotTank::update(float dt, const PlayerTank& player, const std::vector<Wall>& walls, const GameMap& gameMap, std::vector<Projectile>& projectiles)
 {
-    
+    if (!isAlive()) return;
+
     updateCooldown(dt);
 
-    
-    float dx = player.getTankCenter().getX() - tankCenter.getX();
-    float dy = player.getTankCenter().getY() - tankCenter.getY();
+    Vector2D botPos = getTankCenter();
+    Vector2D playerPos = player.getTankCenter();
+
+    float dx = playerPos.getX() - botPos.getX();
+    float dy = playerPos.getY() - botPos.getY();
     float distance = std::sqrt(dx * dx + dy * dy);
 
-    float agroRadius = 300.0f;
+    float visionRadius = 250.0f; 
 
     
-    bool canSeePlayer = (distance <= agroRadius && distance > 0.0001f) &&
-        hasLineOfSight(tankCenter, player.getTankCenter(), walls);
+    bool canSeePlayer = (distance <= visionRadius) && hasLineOfSight(botPos, playerPos, walls);
 
     if (canSeePlayer)
     {
-        
         botState = BotState::Chase;
-        direction = Vector2D(dx / distance, dy / distance);
+    }
+    else
+    {
+        botState = BotState::Patrol;
+    }
+
+    if (botState == BotState::Chase)
+    {
+        
+        if (distance > 0.001f)
+        {
+            direction = Vector2D(dx / distance, dy / distance);
+        }
+        move(dt, walls, gameMap);
 
         if (canFire())
         {
             projectiles.push_back(fire());
-            resetCooldown();
         }
-
-        
-        patrolTimer = 0.0f;
     }
-    else
+    else 
     {
         
-        botState = BotState::Patrol;
-
-        
-        patrolTimer += dt;
-
-        
-        if ((direction.getX() == 0.0f && direction.getY() == 0.0f) || patrolTimer >= 2.5f)
+        patrolTimer -= dt;
+        if (patrolTimer <= 0.0f)
         {
-            direction = getRandomDirection();
-            patrolTimer = 0.0f;
+            patrolTimer = 2.0f + (rand() % 20) / 10.0f;
+            int dirIndex = rand() % 4;
+            if (dirIndex == 0) direction = Vector2D(0.0f, -1.0f);
+            else if (dirIndex == 1) direction = Vector2D(0.0f, 1.0f);
+            else if (dirIndex == 2) direction = Vector2D(-1.0f, 0.0f);
+            else direction = Vector2D(1.0f, 0.0f);
         }
+        move(dt, walls, gameMap);
     }
-
-    
-    move(dt, walls, gameMap);
 }
 
 void BotTank::move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap)
 {
-	if (direction.getX() == 0.0f && direction.getY() == 0.0f)
-	{
-		return;
-	}
+    float modifier = gameMap.getSpeedModifier(tankCenter);
+    float moveDistance = speed * modifier * dt;
 
-	float speedModifier = gameMap.getSpeedModifier(tankCenter);
-	float moveDistance = speed * speedModifier * dt;
-	float halfSize = size / 2.0f;
+    float halfSize = static_cast<float>(size) / 2.0f;
+    float mapSizeX = gameMap.getWidth() * gameMap.getTileSize();
+    float mapSizeY = gameMap.getHeight() * gameMap.getTileSize();
 
+    
+    float nextX = tankCenter.getX() + direction.getX() * moveDistance;
+    nextX = std::clamp(nextX, halfSize, mapSizeX - halfSize);
 
-	float mapSizeX = static_cast<float>(gameMap.getWidth() * gameMap.getTileSize());
-	float mapSizeY = static_cast<float>(gameMap.getHeight() * gameMap.getTileSize());
-
-
-	float nextX = tankCenter.getX() + direction.getX() * moveDistance;
-	std::clamp(nextX, halfSize, mapSizeX - halfSize);
-
-    Vector2D potentialTopLeftX(nextX - halfSize, tankCenter.getY() - halfSize);
-    BoxCollider colX(potentialTopLeftX, static_cast<float>(size), static_cast<float>(size));
+    Vector2D testPosPosX(nextX, tankCenter.getY());
+    Vector2D topLeftX(testPosPosX.getX() - halfSize, testPosPosX.getY() - halfSize);
+    BoxCollider testBoxX(topLeftX, static_cast<float>(size), static_cast<float>(size));
 
     bool collideX = false;
     for (const auto& wall : walls)
     {
-        if (colX.intersects(wall.getCollider()))
+        if (!wall.isDestroyed() && testBoxX.intersects(wall.getCollider()))
         {
             collideX = true;
             break;
         }
     }
-
     if (!collideX)
     {
         tankCenter.setX(nextX);
     }
 
-
+    
     float nextY = tankCenter.getY() + direction.getY() * moveDistance;
-    std::clamp(nextY, halfSize, mapSizeY - halfSize);
+    nextY = std::clamp(nextY, halfSize, mapSizeY - halfSize);
 
-    Vector2D potentialTopLeftY(tankCenter.getX() - halfSize, nextY - halfSize);
-    BoxCollider colY(potentialTopLeftY, static_cast<float>(size), static_cast<float>(size));
+    Vector2D testPosPosY(tankCenter.getX(), nextY);
+    Vector2D topLeftY(testPosPosY.getX() - halfSize, testPosPosY.getY() - halfSize);
+    BoxCollider testBoxY(topLeftY, static_cast<float>(size), static_cast<float>(size));
 
     bool collideY = false;
     for (const auto& wall : walls)
     {
-        if (colY.intersects(wall.getCollider()))
+        if (!wall.isDestroyed() && testBoxY.intersects(wall.getCollider()))
         {
-            collideX = true;
+            collideY = true;
             break;
         }
     }
-
     if (!collideY)
     {
         tankCenter.setY(nextY);
-    }
-    if (collideX && collideY)
-    {
-        if (rand() % 2 == 0)
-        {
-            direction = Vector2D(-direction.getY(), direction.getX());
-        }
-        else
-        {
-            direction = Vector2D(direction.getY(), -direction.getX());
-        }
-
     }
 }

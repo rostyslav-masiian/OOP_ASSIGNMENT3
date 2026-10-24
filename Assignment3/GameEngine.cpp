@@ -7,7 +7,7 @@ void GameEngine::removeDestroyed()
 {
 	std::erase_if(projectiles, [](const Projectile& p) {return !p.isAlive();});
 	std::erase_if(walls, [](const Wall& w) {return w.isDestroyed(); });
-	std::erase_if(bots, [](const BotTank& bt) {return !bt.isAlive(); });
+	std::erase_if(bots, [](const std::unique_ptr<BotTank>& bot) {return !bot || !bot->isAlive(); });
 
 }
 void GameEngine::checkCollisions()
@@ -52,6 +52,17 @@ void GameEngine::checkCollisions()
 
 void GameEngine::update(float dt)
 {
+	for (auto& proj : projectiles)
+	{
+		proj.move(dt);
+	}
+	std::erase_if(projectiles, [this](const Projectile& p) {
+		return !p.isAlive() ||
+			p.getCenter().getX() <= 0 ||
+			p.getCenter().getY() <= 0 ||
+			p.getCenter().getX() >= gameMap.getWidth() * gameMap.getTileSize() ||
+			p.getCenter().getY() >= gameMap.getHeight() * gameMap.getTileSize();
+		});
 	if (playerTank && playerTank->isAlive())
 	{
 		playerTank->handleInput();
@@ -70,21 +81,17 @@ void GameEngine::update(float dt)
 			bot->update(dt, *playerTank, walls, gameMap, projectiles);
 		}
 	}
-	for (auto& proj : projectiles)
-	{
-		proj.move(dt);	
-	}
 	checkCollisions();
 	removeDestroyed();
 }
 
 
-bool GameEngine::didPlayerWin()
+bool GameEngine::didPlayerWin() const
 {
 	return bots.empty() && playerTank->isAlive();
 }
 
-bool GameEngine::isGameOver()
+bool GameEngine::isGameOver() const
 {
 	
 	return !playerTank || !playerTank->isAlive() || bots.empty();

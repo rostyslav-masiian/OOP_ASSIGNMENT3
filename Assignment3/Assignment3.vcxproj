@@ -146,10 +146,12 @@
     <ClCompile Include="BotTank.cpp" />
     <ClCompile Include="BoxCollider.cpp" />
     <ClCompile Include="CircleCollider.cpp" />
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameEngine.cpp" />
     <ClCompile Include="GameMap.cpp" />
     <ClCompile Include="PlayerTank.cpp" />
     <ClCompile Include="Projectile.cpp" />
+    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Tank.cpp" />
     <ClCompile Include="Wall.cpp" />
   </ItemGroup>
@@ -158,10 +160,12 @@
     <ClInclude Include="BoxCollider.h" />
     <ClInclude Include="CircleCollider.h" />
     <ClInclude Include="Collider.h" />
+    <ClInclude Include="Game.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameMap.h" />
     <ClInclude Include="PlayerTank.h" />
     <ClInclude Include="Projectile.h" />
+    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Tank.h" />
     <ClInclude Include="Vector2D.h" />
     <ClInclude Include="Wall.h" />

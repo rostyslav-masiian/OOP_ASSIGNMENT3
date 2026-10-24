@@ -1,14 +1,9 @@
-#include <SFML/Graphics.hpp>
-#include <vector>
-#include <string>
-#include <optional>
-#include <iostream>
-#include <cmath>
-#include <algorithm>
-#include <cstdlib>
-#include <ctime>
+
+#include "Game.h"
 
 int main()
 {
+    Game game;
+    game.run();
     return 0;
 }

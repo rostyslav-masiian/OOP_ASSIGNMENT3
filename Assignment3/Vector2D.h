@@ -1,4 +1,6 @@
 #pragma once
+#include <cmath>
+
 class Vector2D
 {
 private:

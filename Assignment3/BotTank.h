@@ -1,5 +1,6 @@
 #pragma once
 #include "Tank.h"
+#include "Projectile.h"
 #include <vector>
 
 class PlayerTank;
@@ -19,7 +20,7 @@ private:
 	BotState botState = BotState::Patrol;
 
 public:
-	using Tank::Tank;
+	BotTank(Vector2D startPos, float speed, int health);
 	BotState getBotState() const;
 	bool isSegmentIntersectingBox(const Vector2D& p1, const Vector2D& p2, const BoxCollider& box);
 	bool hasLineOfSight(const Vector2D& botPos, const Vector2D& playerPos, const std::vector<Wall>& walls);
