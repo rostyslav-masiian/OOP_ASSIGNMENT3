@@ -10,9 +10,12 @@ Vector2D Projectile::getCenter() const { return projCenter; }
 int Projectile::getDamage() const { return damage; }
 float Projectile::getRadius() const { return radius; }
 float Projectile::getSpeed() const { return speed; }
-bool Projectile::isExpired() { return lifespan <= 0; }
+void Projectile::destroy() { destroyed = true; }
+bool Projectile::isAlive() const { return !destroyed && lifespan > 0.0f; }
+Tank* Projectile::getOwner() const { return owner; }
 
 CircleCollider Projectile::getCollider() const { return CircleCollider(projCenter, radius); }
+
 
 void Projectile::move(float dt)
 {

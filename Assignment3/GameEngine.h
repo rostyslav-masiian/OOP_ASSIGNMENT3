@@ -12,6 +12,8 @@
 class GameEngine
 {
 private:
+	
+
 	GameMap gameMap;
 	std::unique_ptr<PlayerTank> playerTank;
 	std::vector< std::unique_ptr<BotTank>> bots;
@@ -22,8 +24,7 @@ private:
 	void checkCollisions();
 public:
 	GameEngine(GameMap map, std::unique_ptr<PlayerTank> playerTank, std::vector< std::unique_ptr<BotTank>> bots, std::vector<Wall> walls);
-	void update();
-	void handleFire(Tank& tank);
+	void update(float dt);
 	bool isGameOver();
 	bool didPlayerWin();
 };

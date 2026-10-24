@@ -15,3 +15,5 @@ void Wall::takeDamage(int amount)
 {
 	health -= amount; 
 }
+
+bool Wall::isDestroyed() const { return health <= 0; }

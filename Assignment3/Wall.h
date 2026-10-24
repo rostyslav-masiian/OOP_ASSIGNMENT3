@@ -12,6 +12,7 @@ protected:
 public:
 	Wall(int gridX, int gridY, float tileSize);
 	void takeDamage(int amount);
+	bool isDestroyed() const;
 	int getHealth() const;
 	Vector2D getPosition() const;
 	BoxCollider getCollider() const;

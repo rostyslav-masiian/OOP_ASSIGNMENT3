@@ -4,6 +4,22 @@
 
 
 
+bool PlayerTank::isAlive() const { return health > 0; }
+
+
+void PlayerTank::handleInput()
+{
+    Vector2D dir(0.0f, 0.0f);
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::W)) dir.setY(dir.getY() - 1.0f);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::S)) dir.setY(dir.getY() + 1.0f);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A)) dir.setX(dir.getX() - 1.0f);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D)) dir.setX(dir.getX() + 1.0f);
+
+
+    direction = dir;
+}
+
 void PlayerTank::move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap)
 {
     if (direction.getX() == 0.0f && direction.getY() == 0.0f)
