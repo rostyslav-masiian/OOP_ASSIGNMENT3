@@ -12,7 +12,6 @@ BotTank::BotTank(Vector2D startPos, float speed, int health)
     : Tank(startPos, speed, health) {}
 
 BotState BotTank::getBotState() const { return botState; }
-bool BotTank::isAlive() const { return health > 0; }
 
 
 
@@ -89,10 +88,10 @@ static Vector2D getRandomDirection()
 
     std::uniform_int_distribution<size_t> dist(0, directions.size() - 1);
 
-    return directions[dist(rng)];
+    return directions[dist(rng)].normalized();
 }
 
-void BotTank::update(float dt, const PlayerTank& player, const std::vector<Wall>& walls, const GameMap& gameMap, std::vector<Projectile>& projectiles)
+void BotTank::update(float dt, const PlayerTank& player, const std::vector<Wall>& walls, const GameMap& gameMap, std::vector<Projectile>& projectiles) 
 {
     if (!isAlive()) return;
 
@@ -101,105 +100,103 @@ void BotTank::update(float dt, const PlayerTank& player, const std::vector<Wall>
     Vector2D botPos = getTankCenter();
     Vector2D playerPos = player.getTankCenter();
 
-    float dx = playerPos.getX() - botPos.getX();
-    float dy = playerPos.getY() - botPos.getY();
-    float distance = std::sqrt(dx * dx + dy * dy);
+    Vector2D toPlayer = playerPos - botPos;
+    float distance = toPlayer.length();
+    float visionRadius = 250.0f;
 
-    float visionRadius = 250.0f; 
-
-    
     bool canSeePlayer = (distance <= visionRadius) && hasLineOfSight(botPos, playerPos, walls);
 
-    if (canSeePlayer)
-    {
+    if (canSeePlayer) {
         botState = BotState::Chase;
     }
-    else
-    {
+    else {
         botState = BotState::Patrol;
     }
 
-    if (botState == BotState::Chase)
-    {
-        
-        if (distance > 0.001f)
-        {
-            direction = Vector2D(dx / distance, dy / distance);
+    
+    Vector2D previousPosition = tankCenter;
+
+    
+    if (botState == BotState::Chase) {
+        if (distance > 0.001f) {
+            this->direction = toPlayer.normalized();
         }
+
+        
         move(dt, walls, gameMap);
 
-        if (canFire())
-        {
+        if (canFire()) {
             projectiles.push_back(fire());
         }
     }
-    else 
-    {
-        
+    else {
         patrolTimer -= dt;
-        if (patrolTimer <= 0.0f)
-        {
+        if (patrolTimer <= 0.0f) {
             patrolTimer = 2.0f + (rand() % 20) / 10.0f;
-            int dirIndex = rand() % 4;
-            if (dirIndex == 0) direction = Vector2D(0.0f, -1.0f);
-            else if (dirIndex == 1) direction = Vector2D(0.0f, 1.0f);
-            else if (dirIndex == 2) direction = Vector2D(-1.0f, 0.0f);
-            else direction = Vector2D(1.0f, 0.0f);
+            this->direction = getRandomDirection();
         }
+
         move(dt, walls, gameMap);
+    }
+
+    
+    if (player.isAlive()) {
+        float halfSize = static_cast<float>(size) / 2.0f;
+        Vector2D topLeft(tankCenter.getX() - halfSize, tankCenter.getY() - halfSize);
+        BoxCollider botBox(topLeft, static_cast<float>(size), static_cast<float>(size));
+
+        
+        if (botBox.intersects(player.getCollider())) {
+            tankCenter = previousPosition;
+        }
     }
 }
 
-void BotTank::move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap)
+void BotTank::move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap) 
 {
+    if (direction.length() == 0.0f) return;
+
+    Vector2D moveDir = direction.normalized();
     float modifier = gameMap.getSpeedModifier(tankCenter);
     float moveDistance = speed * modifier * dt;
 
     float halfSize = static_cast<float>(size) / 2.0f;
-    float mapSizeX = gameMap.getWidth() * gameMap.getTileSize();
-    float mapSizeY = gameMap.getHeight() * gameMap.getTileSize();
+    float mapSizeX = static_cast<float>(gameMap.getWidth()) * gameMap.getTileSize();
+    float mapSizeY = static_cast<float>(gameMap.getHeight()) * gameMap.getTileSize();
 
     
-    float nextX = tankCenter.getX() + direction.getX() * moveDistance;
-    nextX = std::clamp(nextX, halfSize, mapSizeX - halfSize);
-
+    float nextX = std::clamp(tankCenter.getX() + moveDir.getX() * moveDistance, halfSize, mapSizeX - halfSize);
     Vector2D testPosPosX(nextX, tankCenter.getY());
     Vector2D topLeftX(testPosPosX.getX() - halfSize, testPosPosX.getY() - halfSize);
     BoxCollider testBoxX(topLeftX, static_cast<float>(size), static_cast<float>(size));
 
     bool collideX = false;
-    for (const auto& wall : walls)
-    {
-        if (!wall.isDestroyed() && testBoxX.intersects(wall.getCollider()))
-        {
+    for (const auto& wall : walls) {
+        if (!wall.isDestroyed() && testBoxX.intersects(wall.getCollider())) {
             collideX = true;
             break;
         }
     }
-    if (!collideX)
-    {
+    if (!collideX) {
         tankCenter.setX(nextX);
     }
 
     
-    float nextY = tankCenter.getY() + direction.getY() * moveDistance;
-    nextY = std::clamp(nextY, halfSize, mapSizeY - halfSize);
-
+    float nextY = std::clamp(tankCenter.getY() + moveDir.getY() * moveDistance, halfSize, mapSizeY - halfSize);
     Vector2D testPosPosY(tankCenter.getX(), nextY);
     Vector2D topLeftY(testPosPosY.getX() - halfSize, testPosPosY.getY() - halfSize);
     BoxCollider testBoxY(topLeftY, static_cast<float>(size), static_cast<float>(size));
 
     bool collideY = false;
-    for (const auto& wall : walls)
-    {
-        if (!wall.isDestroyed() && testBoxY.intersects(wall.getCollider()))
-        {
+    for (const auto& wall : walls) {
+        if (!wall.isDestroyed() && testBoxY.intersects(wall.getCollider())) {
             collideY = true;
             break;
         }
     }
-    if (!collideY)
-    {
+    if (!collideY) {
         tankCenter.setY(nextY);
     }
 }
+
+ 

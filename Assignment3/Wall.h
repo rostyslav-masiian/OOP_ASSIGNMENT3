@@ -10,7 +10,7 @@ protected:
 	int health = 50;
 	Vector2D position;
 public:
-	Wall(int gridX, int gridY, float tileSize);
+	Wall(int gridX, int gridY, float tileSize, int health= 50);
 	void takeDamage(int amount);
 	bool isDestroyed() const;
 	int getHealth() const;

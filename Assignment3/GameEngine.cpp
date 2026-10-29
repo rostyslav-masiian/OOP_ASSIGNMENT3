@@ -67,7 +67,20 @@ void GameEngine::update(float dt)
 	{
 		playerTank->handleInput();
 		playerTank->updateCooldown(dt);
+
+		Vector2D previousPosition = playerTank->getTankCenter();
 		playerTank->move(dt, walls, gameMap);
+
+		for (const std::unique_ptr<BotTank>& bot : bots)
+		{
+			if (bot && bot->isAlive() &&
+				playerTank->getCollider().intersects(bot->getCollider()))
+			{
+				playerTank->setTankCenter(previousPosition);
+				break;
+			}
+		}
+
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space) && playerTank->canFire())
 		{
 			projectiles.push_back(playerTank->fire());

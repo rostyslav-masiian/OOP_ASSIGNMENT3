@@ -17,7 +17,6 @@ public:
     
     bool intersects(const Collider& other) const override 
     {
-        
         return other.intersectsWith(*this);
     }
 
