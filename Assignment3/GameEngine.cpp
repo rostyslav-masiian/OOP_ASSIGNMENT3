@@ -67,6 +67,7 @@ void GameEngine::update(float dt)
 	if (playerTank && playerTank->isAlive())
 	{
 		playerTank->handleInput();
+
 		playerTank->updateCooldown(dt);
 
 		Vector2D previousPosition = playerTank->getTankCenter();
@@ -85,16 +86,27 @@ void GameEngine::update(float dt)
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space) && playerTank->canFire())
 		{
 			projectiles.push_back(playerTank->fire());
-			playerTank->resetCooldown();
 		}
 	}
-	for (auto& bot : bots)
+
+	for (std::unique_ptr<BotTank>& bot : bots)
 	{
 		if (bot && bot->isAlive() && playerTank)
 		{
+			Vector2D previousPosition = bot->getTankCenter();
 			bot->update(dt, *playerTank, walls, gameMap, projectiles);
+			for (const std::unique_ptr<BotTank>& other : bots)
+			{
+				if (other && other != bot && other->isAlive() &&
+					bot->getCollider().intersects(other->getCollider()))
+				{
+					bot->setTankCenter(previousPosition);
+					break;
+				}
+			}
 		}
 	}
+
 	checkCollisions();
 	removeDestroyed();
 }
