@@ -57,5 +57,5 @@ Projectile Tank::fire()
 
 	float offset = (static_cast<float>(this->size) / 2.0f) + 8.0f;
 	Vector2D spawnPos = this->tankCenter + (fireDir * offset);
-	return Projectile(spawnPos, direction, this);
+	return Projectile(spawnPos, direction, getProjectileOwner());
 }

@@ -35,6 +35,7 @@ public:
 	BoxCollider getCollider() const;
 	Projectile fire();
 	virtual void move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap) = 0;
+	virtual ProjectileOwner getProjectileOwner() const = 0;
 	virtual ~Tank() = default;
 };
 

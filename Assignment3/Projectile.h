@@ -2,7 +2,11 @@
 #include "Vector2D.h"
 #include "CircleCollider.h"
 
-class Tank;
+enum class ProjectileOwner
+{
+	Player,
+	Bot
+};
 
 class Projectile
 {
@@ -15,11 +19,10 @@ protected:
 
 	Vector2D projCenter;
 	Vector2D direction;
-	Tank* owner = nullptr;
-	
+	ProjectileOwner ownerType;
 
 public:
-	Projectile(Vector2D projCenter, Vector2D direction, Tank* owner);
+	Projectile(Vector2D projCenter, Vector2D direction, ProjectileOwner ownerType);
 	void move(float dt);
 	Vector2D getCenter() const;
 	float getRadius() const;
@@ -29,7 +32,7 @@ public:
 
 	void destroy();
 	bool isAlive() const;
-	Tank* getOwner() const;
+	ProjectileOwner getOwner() const;
+
 
 };
-

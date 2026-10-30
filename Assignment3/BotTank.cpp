@@ -13,7 +13,7 @@ BotTank::BotTank(Vector2D startPos, float speed, int health)
 
 BotState BotTank::getBotState() const { return botState; }
 
-
+ProjectileOwner BotTank::getProjectileOwner() const { return ProjectileOwner::Bot; }
 
 
 bool BotTank::isSegmentIntersectingBox(const Vector2D& p1, const Vector2D& p2, const BoxCollider& box)

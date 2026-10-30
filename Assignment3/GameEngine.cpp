@@ -12,9 +12,9 @@ void GameEngine::removeDestroyed()
 }
 void GameEngine::checkCollisions()
 {
-	for (auto& proj : projectiles)
+	for (Projectile& proj : projectiles)
 	{
-		for (auto& wall : walls)
+		for (Wall& wall : walls)
 		{
 			if (!wall.isDestroyed() && proj.getCollider().intersectsWith(wall.getCollider()))
 			{
@@ -25,26 +25,27 @@ void GameEngine::checkCollisions()
 		}
 		if (!proj.isAlive()) continue;
 
-		if (playerTank && proj.getOwner() != playerTank.get())
+		
+		if (proj.getOwner() == ProjectileOwner::Bot)
 		{
-			if (playerTank->isAlive() && proj.getCollider().intersectsWith(playerTank->getCollider()))
+			if (playerTank && playerTank->isAlive() &&
+				proj.getCollider().intersectsWith(playerTank->getCollider()))
 			{
 				playerTank->takeDamage(proj.getDamage());
 				proj.destroy();
-				break;
 			}
+			continue;
 		}
 
-		for (auto& bot : bots)
+		
+		for (std::unique_ptr<BotTank>& bot : bots)
 		{
-			if (bot && proj.getOwner() != bot.get())
+			if (bot && bot->isAlive() &&
+				proj.getCollider().intersects(bot->getCollider()))
 			{
-				if (bot->isAlive() && proj.getCollider().intersects(bot->getCollider()))
-				{
-					bot->takeDamage(proj.getDamage());
-					proj.destroy();
-					break;
-				}
+				bot->takeDamage(proj.getDamage());
+				proj.destroy();
+				break;
 			}
 		}
 	}

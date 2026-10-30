@@ -9,6 +9,7 @@ PlayerTank::PlayerTank(Vector2D startPos, float speed, int health)
 {
     handleInput();
 }
+ProjectileOwner PlayerTank::getProjectileOwner() const { return ProjectileOwner::Player; }
 
 
 void PlayerTank::handleInput()

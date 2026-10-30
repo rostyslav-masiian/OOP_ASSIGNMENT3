@@ -1,8 +1,10 @@
 #include "Projectile.h"
 #include "Tank.h"
 
-Projectile::Projectile(Vector2D projCenter, Vector2D direction, Tank* owner)
-	: projCenter(projCenter), direction(direction), owner(owner) {}
+
+Projectile::Projectile(Vector2D projCenter, Vector2D direction, ProjectileOwner ownerType)
+	: projCenter(projCenter), direction(direction), ownerType(ownerType) {}
+
 
 
 Vector2D Projectile::getCenter() const { return projCenter; }
@@ -12,7 +14,7 @@ float Projectile::getRadius() const { return radius; }
 float Projectile::getSpeed() const { return speed; }
 void Projectile::destroy() { destroyed = true; }
 bool Projectile::isAlive() const { return !destroyed && lifespan > 0.0f; }
-Tank* Projectile::getOwner() const { return owner; }
+ProjectileOwner Projectile::getOwner() const { return ownerType; }
 
 CircleCollider Projectile::getCollider() const { return CircleCollider(projCenter, radius); }
 
