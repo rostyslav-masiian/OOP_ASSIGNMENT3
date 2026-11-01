@@ -8,6 +8,7 @@ Projectile::Projectile(Vector2D projCenter, Vector2D direction, ProjectileOwner 
 
 
 Vector2D Projectile::getCenter() const { return projCenter; }
+Vector2D Projectile::getDirection() const { return direction; }
 
 int Projectile::getDamage() const { return damage; }
 float Projectile::getRadius() const { return radius; }

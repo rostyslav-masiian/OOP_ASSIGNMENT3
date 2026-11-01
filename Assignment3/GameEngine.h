@@ -8,6 +8,7 @@
 
 #include <vector>
 #include <memory>
+#include "InputState.h"
 
 class GameEngine
 {
@@ -22,9 +23,12 @@ private:
 
 	void removeDestroyed();
 	void checkCollisions();
+	bool collidesWithOtherTank(const Tank& tank) const;
+	bool isOutsideMap(const Projectile& p) const;
 public:
 	GameEngine(GameMap map, std::unique_ptr<PlayerTank> playerTank, std::vector< std::unique_ptr<BotTank>> bots, std::vector<Wall> walls);
-	void update(float dt);
+	void update(float dt, const InputState& input);
+	
 	bool isGameOver() const;
 	bool didPlayerWin() const;
 

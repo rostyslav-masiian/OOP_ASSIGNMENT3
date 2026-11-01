@@ -2,9 +2,12 @@
 
 
 Tank::Tank(Vector2D startPos, float speed, int health=100)
-	: tankCenter(startPos), speed(speed), health(health) {}
+	: tankCenter(startPos), speed(speed), health(health), maxHealth(health) {}
+
+
 int Tank::getSize() const { return size; }
 int Tank::getHealth() const { return health; }
+int Tank::getMaxHealth() const { return maxHealth; }
 Vector2D Tank::getTankCenter() const { return tankCenter; }
 Vector2D Tank::getDirection() const { return direction; }
 bool Tank::isAlive() const { return health > 0; }

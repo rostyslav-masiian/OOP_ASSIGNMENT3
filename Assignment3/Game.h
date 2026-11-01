@@ -3,6 +3,7 @@
 #include <memory>
 #include "GameEngine.h"
 #include "Renderer.h"
+#include "InputState.h"
 
 class Game
 {
@@ -15,7 +16,7 @@ private:
     void processEvents();
     void update(float dt);
     void render();
-
+    InputState readInput();
     static GameEngine createInitialEngine();
 public:
     Game();

@@ -13,6 +13,7 @@ class Tank
 protected:
 	int size = 32;
 	int health = 100;
+	int maxHealth;
 	float speed = 10;
 	Vector2D tankCenter;
 	Vector2D direction = Vector2D(0, 0);
@@ -25,6 +26,7 @@ public:
 	int getSize() const;
 	bool isAlive() const;
 	int getHealth() const;
+	int getMaxHealth() const;
 	Vector2D getTankCenter() const;
 	Vector2D getDirection() const;
 	void takeDamage(int takenDamage);

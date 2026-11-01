@@ -1,5 +1,6 @@
 #include "Game.h"
 
+
 GameEngine Game::createInitialEngine()
 {
     float tileSize = 32.0f;
@@ -9,10 +10,6 @@ GameEngine Game::createInitialEngine()
     GameMap map(mapWidth, mapHeight, tileSize);
     std::vector<Wall> walls;
 
-    
-    
-
-    
     walls.push_back(Wall(5, 5, tileSize));
     walls.push_back(Wall(5, 6, tileSize));
     walls.push_back(Wall(6, 5, tileSize));
@@ -73,10 +70,20 @@ void Game::update(float dt)
 {
     if (!engine.isGameOver())
     {
-        engine.update(dt);
+        engine.update(dt, readInput());
     }
 }
 
+InputState Game::readInput()
+{
+    InputState input;
+    input.forward = sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::W);
+    input.turnRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D);
+    input.turnLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A);
+    input.fire = sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space);
+    
+    return input;
+}
 
 void Game::render()
 {

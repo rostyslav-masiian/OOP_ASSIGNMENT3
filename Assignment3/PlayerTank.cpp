@@ -20,12 +20,12 @@ void PlayerTank::handleInput()
 void PlayerTank::move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap)
 {
     
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A)) angle -= turnSpeed * dt;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D)) angle += turnSpeed * dt;
+    if (input.turnLeft) angle -= turnSpeed * dt;
+    if (input.turnRight) angle += turnSpeed * dt;
     handleInput();
 
     
-    if (!sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::W))
+    if (!input.forward)
     {
         return;
     }

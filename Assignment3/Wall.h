@@ -14,6 +14,8 @@ public:
 	void takeDamage(int amount);
 	bool isDestroyed() const;
 	int getHealth() const;
+	float getWidth() const;
+	float getHeight() const;
 	Vector2D getPosition() const;
 	BoxCollider getCollider() const;
 };

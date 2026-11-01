@@ -25,6 +25,7 @@ public:
 	Projectile(Vector2D projCenter, Vector2D direction, ProjectileOwner ownerType);
 	void move(float dt);
 	Vector2D getCenter() const;
+	Vector2D getDirection() const;
 	float getRadius() const;
 	int getDamage() const;
 	float getSpeed() const;

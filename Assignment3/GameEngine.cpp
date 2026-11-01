@@ -5,7 +5,7 @@ GameEngine::GameEngine(GameMap map, std::unique_ptr<PlayerTank> playerTank, std:
 
 void GameEngine::removeDestroyed()
 {
-	std::erase_if(projectiles, [](const Projectile& p) {return !p.isAlive();});
+	std::erase_if(projectiles, [this](const Projectile& p) {return !p.isAlive() || isOutsideMap(p);});
 	std::erase_if(walls, [](const Wall& w) {return w.isDestroyed(); });
 	std::erase_if(bots, [](const std::unique_ptr<BotTank>& bot) {return !bot || !bot->isAlive(); });
 
@@ -50,40 +50,54 @@ void GameEngine::checkCollisions()
 		}
 	}
 }
+bool GameEngine::isOutsideMap(const Projectile& p) const
+{
+	const float mapWidthPx = static_cast<float>(gameMap.getWidth()) * gameMap.getTileSize();
+	const float mapHeightPx = static_cast<float>(gameMap.getHeight()) * gameMap.getTileSize();
 
-void GameEngine::update(float dt)
+	return p.getCenter().getX() <= 0 || p.getCenter().getY() <= 0 ||
+		p.getCenter().getX() >= mapWidthPx || p.getCenter().getY() >= mapHeightPx;
+}
+bool GameEngine::collidesWithOtherTank(const Tank& tank) const
+{
+	BoxCollider box = tank.getCollider();
+
+	if (playerTank && playerTank.get() != &tank && playerTank->isAlive() &&
+		box.intersects(playerTank->getCollider()))
+	{
+		return true;
+	}
+
+	for (const std::unique_ptr<BotTank>& bot : bots)
+	{
+		if (bot && bot.get() != &tank && bot->isAlive() &&
+			box.intersects(bot->getCollider()))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+void GameEngine::update(float dt, const InputState& input)
 {
 	for (auto& proj : projectiles)
 	{
 		proj.move(dt);
 	}
-	std::erase_if(projectiles, [this](const Projectile& p) {
-		return !p.isAlive() ||
-			p.getCenter().getX() <= 0 ||
-			p.getCenter().getY() <= 0 ||
-			p.getCenter().getX() >= gameMap.getWidth() * gameMap.getTileSize() ||
-			p.getCenter().getY() >= gameMap.getHeight() * gameMap.getTileSize();
-		});
 	if (playerTank && playerTank->isAlive())
 	{
-		playerTank->handleInput();
-
+		playerTank->setInput(input);
 		playerTank->updateCooldown(dt);
 
 		Vector2D previousPosition = playerTank->getTankCenter();
 		playerTank->move(dt, walls, gameMap);
-
-		for (const std::unique_ptr<BotTank>& bot : bots)
+		if (collidesWithOtherTank(*playerTank))
 		{
-			if (bot && bot->isAlive() &&
-				playerTank->getCollider().intersects(bot->getCollider()))
-			{
-				playerTank->setTankCenter(previousPosition);
-				break;
-			}
+			playerTank->setTankCenter(previousPosition);
 		}
 
-		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space) && playerTank->canFire())
+		if (input.fire && playerTank->canFire())
 		{
 			projectiles.push_back(playerTank->fire());
 		}
@@ -95,14 +109,9 @@ void GameEngine::update(float dt)
 		{
 			Vector2D previousPosition = bot->getTankCenter();
 			bot->update(dt, *playerTank, walls, gameMap, projectiles);
-			for (const std::unique_ptr<BotTank>& other : bots)
+			if (collidesWithOtherTank(*bot))
 			{
-				if (other && other != bot && other->isAlive() &&
-					bot->getCollider().intersects(other->getCollider()))
-				{
-					bot->setTankCenter(previousPosition);
-					break;
-				}
+				bot->setTankCenter(previousPosition);
 			}
 		}
 	}
