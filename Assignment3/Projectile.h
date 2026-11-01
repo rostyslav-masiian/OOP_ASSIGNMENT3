@@ -1,14 +1,14 @@
 #pragma once
 #include "Vector2D.h"
 #include "CircleCollider.h"
-
+#include "GameObject.h"
 enum class ProjectileOwner
 {
 	Player,
 	Bot
 };
 
-class Projectile
+class Projectile : public GameObject
 {
 protected:
 	int damage = 34;
@@ -24,15 +24,14 @@ protected:
 public:
 	Projectile(Vector2D projCenter, Vector2D direction, ProjectileOwner ownerType);
 	void move(float dt);
-	Vector2D getCenter() const;
+	Vector2D getCenter() const override;
+	bool isAlive() const override;
 	Vector2D getDirection() const;
 	float getRadius() const;
 	int getDamage() const;
 	float getSpeed() const;
 	CircleCollider getCollider() const;
-
 	void destroy();
-	bool isAlive() const;
 	ProjectileOwner getOwner() const;
 
 

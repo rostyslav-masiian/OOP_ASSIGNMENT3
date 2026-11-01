@@ -7,15 +7,13 @@
 #include <algorithm>
 #include <memory>
 #include "vector"
-
-class Tank
+#include "Damageable.h"
+class Tank : public Damageable
 {
 protected:
 	int size = 32;
-	int health = 100;
-	int maxHealth;
-	float speed = 10;
 	Vector2D tankCenter;
+	float speed = 10;
 	Vector2D direction = Vector2D(0, 0);
 
 	float timeSinceLastShot = 0.0f;
@@ -24,12 +22,8 @@ public:
 	Tank(Vector2D startPos, float speed, int health);
 	
 	int getSize() const;
-	bool isAlive() const;
-	int getHealth() const;
-	int getMaxHealth() const;
-	Vector2D getTankCenter() const;
+	Vector2D getCenter() const override;
 	Vector2D getDirection() const;
-	void takeDamage(int takenDamage);
 	bool canFire();
 	void setTankCenter(const Vector2D& newCenter);
 	void updateCooldown(float dt);

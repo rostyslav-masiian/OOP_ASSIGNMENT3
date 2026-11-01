@@ -90,7 +90,7 @@ void GameEngine::update(float dt, const InputState& input)
 		playerTank->setInput(input);
 		playerTank->updateCooldown(dt);
 
-		Vector2D previousPosition = playerTank->getTankCenter();
+		Vector2D previousPosition = playerTank->getCenter();
 		playerTank->move(dt, walls, gameMap);
 		if (collidesWithOtherTank(*playerTank))
 		{
@@ -107,7 +107,7 @@ void GameEngine::update(float dt, const InputState& input)
 	{
 		if (bot && bot->isAlive() && playerTank)
 		{
-			Vector2D previousPosition = bot->getTankCenter();
+			Vector2D previousPosition = bot->getCenter();
 			bot->update(dt, *playerTank, walls, gameMap, projectiles);
 			if (collidesWithOtherTank(*bot))
 			{

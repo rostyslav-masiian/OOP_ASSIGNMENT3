@@ -161,9 +161,11 @@
     <ClInclude Include="CircleCollider.h" />
     <ClInclude Include="Collider.h" />
     <ClInclude Include="Color.h" />
+    <ClInclude Include="Damageable.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameEngine.h" />
     <ClInclude Include="GameMap.h" />
+    <ClInclude Include="GameObject.h" />
     <ClInclude Include="InputState.h" />
     <ClInclude Include="PlayerTank.h" />
     <ClInclude Include="Projectile.h" />

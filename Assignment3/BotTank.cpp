@@ -97,8 +97,8 @@ void BotTank::update(float dt, const PlayerTank& player, const std::vector<Wall>
 
     updateCooldown(dt);
 
-    Vector2D botPos = getTankCenter();
-    Vector2D playerPos = player.getTankCenter();
+    Vector2D botPos = getCenter();
+    Vector2D playerPos = player.getCenter();
 
     Vector2D toPlayer = playerPos - botPos;
     float distance = toPlayer.length();

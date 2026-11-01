@@ -54,7 +54,7 @@ void Renderer::render(const GameEngine& engine)
         sprite.setOrigin(sf::Vector2f(textureSize.x / 2.0f, textureSize.y / 2.0f));
         sprite.setScale(sf::Vector2f(size / textureSize.x, size / textureSize.y));
 
-        sprite.setPosition(sf::Vector2f(playerTank->getTankCenter().getX(), playerTank->getTankCenter().getY()));
+        sprite.setPosition(sf::Vector2f(playerTank->getCenter().getX(), playerTank->getCenter().getY()));
 
         Vector2D dir = playerTank->getDirection();
         if (dir.getX() != 0.0f || dir.getY() != 0.0f)
@@ -76,7 +76,7 @@ void Renderer::render(const GameEngine& engine)
             sprite.setOrigin(sf::Vector2f(textureSize.x / 2.0f, textureSize.y / 2.0f));
             sprite.setScale(sf::Vector2f(size / textureSize.x, size / textureSize.y));
 
-            sprite.setPosition(sf::Vector2f(bot->getTankCenter().getX(), bot->getTankCenter().getY()));
+            sprite.setPosition(sf::Vector2f(bot->getCenter().getX(), bot->getCenter().getY()));
 
             Vector2D dir = bot->getDirection();
             if (dir.getX() != 0.0f || dir.getY() != 0.0f)
@@ -159,8 +159,8 @@ void Renderer::renderHealthBar(const Tank& tank)
     ratio = std::clamp(ratio, 0.0f, 1.0f);
 
     float halfSize = static_cast<float>(tank.getSize()) / 2.0f;
-    float x = tank.getTankCenter().getX() - barWidth / 2.0f;
-    float y = tank.getTankCenter().getY() - halfSize - offsetAbove;
+    float x = tank.getCenter().getX() - barWidth / 2.0f;
+    float y = tank.getCenter().getY() - halfSize - offsetAbove;
 
     sf::RectangleShape backBar(sf::Vector2f(barWidth, barHeight));
     backBar.setPosition(sf::Vector2f(x, y));

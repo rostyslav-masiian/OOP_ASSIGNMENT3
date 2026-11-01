@@ -2,22 +2,20 @@
 
 
 Wall::Wall(int gridX, int gridY, float tileSize, int health) 
-	: width(tileSize), height(tileSize), position(static_cast<float>(gridX* tileSize), static_cast<float>(gridY* tileSize)), health(health) {}
+	: width(tileSize), height(tileSize), position(static_cast<float>(gridX* tileSize), static_cast<float>(gridY* tileSize)), Damageable(health) {}
 
-int Wall::getHealth() const { return health; }
 Vector2D Wall::getPosition() const { return position; }
 
 float Wall::getWidth() const { return width; }
 float Wall::getHeight() const { return height; }
-
+Vector2D Wall::getCenter() const
+{
+	return Vector2D(position.getX() + width / 2.0f, position.getY() + height / 2.0f);
+}
 BoxCollider Wall::getCollider() const
 {
     return BoxCollider(position, width, height);
 }
 
-void Wall::takeDamage(int amount) 
-{
-	health -= amount; 
-}
 
-bool Wall::isDestroyed() const { return health <= 0; }
+bool Wall::isDestroyed() const { return !isAlive(); }

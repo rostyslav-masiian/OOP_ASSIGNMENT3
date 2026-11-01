@@ -1,22 +1,13 @@
 #include "Tank.h"
 
 
-Tank::Tank(Vector2D startPos, float speed, int health=100)
-	: tankCenter(startPos), speed(speed), health(health), maxHealth(health) {}
+Tank::Tank(Vector2D startPos, float speed, int health)
+	: Damageable(health), speed(speed), tankCenter(startPos) {}
 
 
 int Tank::getSize() const { return size; }
-int Tank::getHealth() const { return health; }
-int Tank::getMaxHealth() const { return maxHealth; }
-Vector2D Tank::getTankCenter() const { return tankCenter; }
 Vector2D Tank::getDirection() const { return direction; }
-bool Tank::isAlive() const { return health > 0; }
-
-
-void Tank::takeDamage(int takenDamage)
-{
-	health -= takenDamage;	
-}
+Vector2D Tank::getCenter() const { return tankCenter; }
 bool Tank::canFire()
 {
 	return timeSinceLastShot <= 0.0f;
