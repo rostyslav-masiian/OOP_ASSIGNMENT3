@@ -12,7 +12,8 @@ private:
 public:
 	PlayerTank(Vector2D startPos, float speed, int health = 1000);
 	void handleInput();
-	void move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap) override;
+	void update(float dt, const std::vector<Wall>& walls, const GameMap& gameMap, const std::vector<const Tank*>& others, std::vector<Projectile>& projectiles) override;
+	void move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap, const std::vector<const Tank*>& others) override;
 	ProjectileOwner getProjectileOwner() const override;
 	void setInput(const InputState& newInput) { input = newInput; }
 };

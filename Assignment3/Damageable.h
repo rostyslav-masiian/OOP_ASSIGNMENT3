@@ -3,7 +3,7 @@
 
 class Damageable : public GameObject
 {
-protected:
+private:
 	int health;
 	int maxHealth;
 

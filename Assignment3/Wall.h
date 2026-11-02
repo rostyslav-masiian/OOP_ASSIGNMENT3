@@ -10,7 +10,6 @@ protected:
 	Vector2D position;
 public:
 	Wall(int gridX, int gridY, float tileSize, int health= 50);
-	bool isDestroyed() const;
 	float getWidth() const;
 	float getHeight() const;
 	Vector2D getCenter() const override;

@@ -10,7 +10,7 @@
 #include "Damageable.h"
 class Tank : public Damageable
 {
-protected:
+private:
 	int size = 32;
 	Vector2D tankCenter;
 	float speed = 10;
@@ -18,6 +18,13 @@ protected:
 
 	float timeSinceLastShot = 0.0f;
 	float timeCooldown = 0.5f;
+
+	bool collidesAt(const Vector2D& center, const std::vector<Wall>& walls, const std::vector<const Tank*>& others) const;
+
+protected:
+	void setDirection(const Vector2D& newDirection);
+	void tryMove(const Vector2D& dir, float dt, const std::vector<Wall>& walls,	const std::vector<const Tank*>& others,	const GameMap& gameMap);
+	
 public:
 	Tank(Vector2D startPos, float speed, int health);
 	
@@ -30,7 +37,8 @@ public:
 	void resetCooldown();
 	BoxCollider getCollider() const;
 	Projectile fire();
-	virtual void move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap) = 0;
+	virtual void update(float dt, const std::vector<Wall>& walls, const GameMap& gameMap, const std::vector<const Tank*>& others, std::vector<Projectile>& projectiles) = 0;
+	virtual void move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap, const std::vector<const Tank*>& others) = 0;
 	virtual ProjectileOwner getProjectileOwner() const = 0;
 	virtual ~Tank() = default;
 };

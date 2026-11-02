@@ -18,6 +18,7 @@ private:
     void render();
     InputState readInput();
     static GameEngine createInitialEngine();
+    void restart();
 public:
     Game();
     void run();

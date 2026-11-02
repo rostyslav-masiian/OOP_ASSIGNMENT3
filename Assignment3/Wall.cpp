@@ -17,5 +17,3 @@ BoxCollider Wall::getCollider() const
     return BoxCollider(position, width, height);
 }
 
-
-bool Wall::isDestroyed() const { return !isAlive(); }

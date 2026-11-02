@@ -14,68 +14,31 @@ ProjectileOwner PlayerTank::getProjectileOwner() const { return ProjectileOwner:
 
 void PlayerTank::handleInput()
 {
-    direction = Vector2D(std::cos(angle), std::sin(angle));
+    setDirection(Vector2D(std::cos(angle), std::sin(angle)));
 }
 
-void PlayerTank::move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap)
+void PlayerTank::move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap,
+    const std::vector<const Tank*>& others)
 {
-    
-    if (input.turnLeft) angle -= turnSpeed * dt;
+    if (input.turnLeft)  angle -= turnSpeed * dt;
     if (input.turnRight) angle += turnSpeed * dt;
     handleInput();
 
-    
-    if (!input.forward)
+    if (input.forward)
     {
-        return;
+        tryMove(getDirection(), dt, walls, others, gameMap);
     }
+}
 
-    Vector2D moveDir = direction;
+void PlayerTank::update(float dt, const std::vector<Wall>& walls, const GameMap& gameMap,
+    const std::vector<const Tank*>& others,
+    std::vector<Projectile>& projectiles)
+{
+    updateCooldown(dt);
+    move(dt, walls, gameMap, others);
 
-    float speedModifier = gameMap.getSpeedModifier(tankCenter);
-    float moveDistance = speed * speedModifier * dt;
-    float halfSize = static_cast<float>(size) / 2.0f;
-
-    float mapWidthPx = static_cast<float>(gameMap.getWidth()) * gameMap.getTileSize();
-    float mapHeightPx = static_cast<float>(gameMap.getHeight()) * gameMap.getTileSize();
-
-    float nextX = tankCenter.getX() + moveDir.getX() * moveDistance;
-    nextX = std::clamp(nextX, halfSize, mapWidthPx - halfSize);
-
-    Vector2D potentialTopLeftX(nextX - halfSize, tankCenter.getY() - halfSize);
-    BoxCollider colX(potentialTopLeftX, static_cast<float>(size), static_cast<float>(size));
-
-    bool collideX = false;
-    for (const Wall& wall : walls)
+    if (input.fire && canFire())
     {
-        if (!wall.isDestroyed() && colX.intersects(wall.getCollider()))
-        {
-            collideX = true;
-            break;
-        }
-    }
-    if (!collideX)
-    {
-        tankCenter.setX(nextX);
-    }
-
-    float nextY = tankCenter.getY() + moveDir.getY() * moveDistance;
-    nextY = std::clamp(nextY, halfSize, mapHeightPx - halfSize);
-
-    Vector2D potentialTopLeftY(tankCenter.getX() - halfSize, nextY - halfSize);
-    BoxCollider colY(potentialTopLeftY, static_cast<float>(size), static_cast<float>(size));
-
-    bool collideY = false;
-    for (const Wall& wall : walls)
-    {
-        if (!wall.isDestroyed() && colY.intersects(wall.getCollider()))
-        {
-            collideY = true;
-            break;
-        }
-    }
-    if (!collideY)
-    {
-        tankCenter.setY(nextY);
+        projectiles.push_back(fire());
     }
 }

@@ -38,8 +38,6 @@ Game::Game()
     window.setFramerateLimit(144);
 }
 
-
-
 void Game::run()
 {
     while (window.isOpen())
@@ -53,25 +51,39 @@ void Game::run()
     }
 }
 
+void Game::restart()
+{
+    engine = createInitialEngine();
+}
 
 void Game::processEvents()
 {
-    while (const std::optional event = window.pollEvent())
+    while (const std::optional<sf::Event> event = window.pollEvent())
     {
         if (event->is<sf::Event::Closed>())
         {
             window.close();
         }
+
+        const sf::Event::KeyPressed* key = event->getIf<sf::Event::KeyPressed>();
+        if (key != nullptr)
+        {
+            if (key->scancode == sf::Keyboard::Scan::P ||
+                key->scancode == sf::Keyboard::Scan::Escape)
+            {
+                engine.togglePause();
+            }
+            else if (key->scancode == sf::Keyboard::Scan::R)
+            {
+                restart();
+            }
+        }
     }
 }
 
-
 void Game::update(float dt)
 {
-    if (!engine.isGameOver())
-    {
-        engine.update(dt, readInput());
-    }
+    engine.update(dt, readInput());
 }
 
 InputState Game::readInput()

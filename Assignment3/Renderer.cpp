@@ -33,7 +33,7 @@ void Renderer::render(const GameEngine& engine)
 
     for (const auto& wall : engine.getWalls())
     {
-        if (!wall.isDestroyed())
+        if (!!wall.isAlive())
         {
             sf::RectangleShape wallShape(sf::Vector2f(wall.getCollider().getWidth(), wall.getCollider().getHeight()));
             wallShape.setPosition(sf::Vector2f(wall.getCollider().getPosition().getX(), wall.getCollider().getPosition().getY()));
@@ -112,41 +112,62 @@ void Renderer::render(const GameEngine& engine)
             window.draw(sprite);
         }
     }
-    if (engine.isGameOver())
-    {
-        renderWin(engine.didPlayerWin());
-    }
     
+    renderState(engine);
 
     window.display();
 }
 
-void Renderer::renderWin(const bool didPlayerWin)
+void Renderer::renderState(const GameEngine& engine)
 {
-    sf::Font font;
-    if (font.openFromFile("C:/Windows/Fonts/impact.ttf"))
+    GameState state = engine.getState();
+    if (state == GameState::Running) return;
+
+    const float width = static_cast<float>(window.getSize().x);
+    const float height = static_cast<float>(window.getSize().y);
+
+    sf::RectangleShape dim(sf::Vector2f(width, height));
+    dim.setFillColor(sf::Color(0, 0, 0, 140));
+    window.draw(dim);
+
+    sf::Text title(font);
+    sf::Text hint(font);
+
+    if (state == GameState::PlayerWon)
     {
-        sf::Text text(font);
-        if (didPlayerWin)
-        {
-            text.setString("!!!PLAYER WON!!!");
-            text.setFillColor(sf::Color::Blue);
-        }
-        else
-        {
-            text.setString("!!!PLAYER LOST!!!");
-            text.setFillColor(sf::Color::Yellow);
-        }
-        text.setCharacterSize(48);
-        text.setStyle(sf::Text::Bold);
-
-        sf::FloatRect bounds = text.getLocalBounds();
-        text.setOrigin(sf::Vector2f{ bounds.position.x + bounds.size.x / 2.0f, bounds.position.y + bounds.size.y / 2.0f });
-        text.setPosition(sf::Vector2f{ window.getSize().x / 2.0f, window.getSize().y / 2.0f });
-
-        window.draw(text);
+        title.setString("YOU WIN!");
+        title.setFillColor(sf::Color::Green);
+        hint.setString("Press R to restart");
+    }
+    else if (state == GameState::PlayerLost)
+    {
+        title.setString("GAME OVER");
+        title.setFillColor(sf::Color::Red);
+        hint.setString("Press R to restart");
+    }
+    else
+    {
+        title.setString("PAUSED");
+        title.setFillColor(sf::Color::White);
+        hint.setString("P / Esc - resume,  R - restart");
     }
 
+    title.setCharacterSize(48);
+    title.setStyle(sf::Text::Bold);
+    hint.setCharacterSize(22);
+
+    sf::FloatRect tb = title.getLocalBounds();
+    title.setOrigin(sf::Vector2f(tb.position.x + tb.size.x / 2.0f,
+        tb.position.y + tb.size.y / 2.0f));
+    title.setPosition(sf::Vector2f(width / 2.0f, height / 2.0f - 20.0f));
+
+    sf::FloatRect hb = hint.getLocalBounds();
+    hint.setOrigin(sf::Vector2f(hb.position.x + hb.size.x / 2.0f,
+        hb.position.y + hb.size.y / 2.0f));
+    hint.setPosition(sf::Vector2f(width / 2.0f, height / 2.0f + 35.0f));
+
+    window.draw(title);
+    window.draw(hint);
 }
 
 void Renderer::renderHealthBar(const Tank& tank)

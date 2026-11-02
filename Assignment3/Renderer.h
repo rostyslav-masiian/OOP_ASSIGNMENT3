@@ -9,8 +9,12 @@ private:
     sf::RenderWindow& window;
     sf::Texture tankTexture;
     sf::Texture projTexture;
+    sf::Font font;
 
 
+    
+    void renderHealthBar(const Tank& tank);
+    void renderState(const GameEngine& engine);
 public:
     Renderer(sf::RenderWindow& win) : window(win) 
     {
@@ -22,10 +26,13 @@ public:
         {
             throw std::runtime_error("Cannot load assets/proj.png");
         }
+
+        if (!font.openFromFile("C:/Windows/Fonts/impact.ttf"))
+        {
+            throw std::runtime_error("Cannot load font");
+        }
     }
 
     
     void render(const GameEngine& engine);
-    void renderWin(const bool didPlayerWin);
-    void renderHealthBar(const Tank& tank);
 };
