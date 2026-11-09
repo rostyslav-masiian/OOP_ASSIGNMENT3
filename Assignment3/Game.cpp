@@ -1,5 +1,5 @@
 #include "Game.h"
-
+#include "Command.h"
 
 GameEngine Game::createInitialEngine()
 {
@@ -83,18 +83,47 @@ void Game::processEvents()
 
 void Game::update(float dt)
 {
-    engine.update(dt, readInput());
+    std::vector<std::unique_ptr<Command>> commands = handleInput();
+    engine.update(dt, commands);
 }
 
-InputState Game::readInput()
+std::vector<std::unique_ptr<Command>> Game::handleInput()
 {
-    InputState input;
-    input.forward = sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::W);
-    input.turnRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D);
-    input.turnLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A);
-    input.fire = sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space);
-    
-    return input;
+    std::vector<std::unique_ptr<Command>> commands;
+
+    while (const std::optional event = window.pollEvent())
+    {
+        if (event->is<sf::Event::Closed>())
+        {
+            window.close();
+        }
+
+        if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
+        {
+            if (keyPressed->code == sf::Keyboard::Key::Escape || keyPressed->code == sf::Keyboard::Key::P)
+            {
+                commands.push_back(std::make_unique<TogglePauseCommand>());
+            }
+        }
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::W))
+    {
+        commands.push_back(std::make_unique<MoveForwardCommand>());
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::D))
+    {
+        commands.push_back(std::make_unique<TurnRightCommand>());
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::A))
+    {
+        commands.push_back(std::make_unique<TurnLeftCommand>());
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Scan::Space))
+    {
+        commands.push_back(std::make_unique<FireCommand>());
+    }
+
+    return commands;
 }
 
 void Game::render()

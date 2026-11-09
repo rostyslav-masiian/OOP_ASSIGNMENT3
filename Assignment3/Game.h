@@ -3,8 +3,9 @@
 #include <memory>
 #include "GameEngine.h"
 #include "Renderer.h"
-#include "InputState.h"
 
+
+class Command;
 class Game
 {
 private:
@@ -16,7 +17,7 @@ private:
     void processEvents();
     void update(float dt);
     void render();
-    InputState readInput();
+    std::vector<std::unique_ptr<Command>> handleInput();
     static GameEngine createInitialEngine();
     void restart();
 public:

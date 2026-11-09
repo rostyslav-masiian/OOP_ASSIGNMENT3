@@ -16,7 +16,7 @@ void Renderer::render(const GameEngine& engine)
         for (int x = 0; x < map.getWidth(); x++)
         {
             sf::RectangleShape tileShape(sf::Vector2f(map.getTileSize(), map.getTileSize()));
-            tileShape.setPosition(sf::Vector2f(x * map.getTileSize(), y * map.getTileSize()));
+            tileShape.setPosition(sf::Vector2f(static_cast<float>(x) * map.getTileSize(), static_cast<float>(y) * map.getTileSize()));
             if (map.getTile(x, y) == TileType::Mud)
             {
                 tileShape.setFillColor(toSf(Palette::Mud));

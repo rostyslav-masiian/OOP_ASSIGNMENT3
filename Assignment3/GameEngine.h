@@ -8,8 +8,8 @@
 
 #include <vector>
 #include <memory>
-#include "InputState.h"
 
+class Command;
 
 enum class GameState
 {
@@ -40,10 +40,14 @@ private:
 	std::vector<Tank*> allTanks() const;
 public:
 	GameEngine(GameMap map, std::unique_ptr<PlayerTank> playerTank, std::vector< std::unique_ptr<BotTank>> bots, std::vector<Wall> walls);
-	void update(float dt, const InputState& input);
+	void update(float dt, std::vector<std::unique_ptr<Command>>& commands);
 	
-	GameState getState() const;
+	void turnPlayerLeft(float dt);
+	void turnPlayerRight(float dt);
+	void movePlayerForward(float dt);
 
+
+	GameState getState() const;
 	void togglePause();
 
 	const GameMap& getMap() const { return gameMap; }
@@ -51,7 +55,7 @@ public:
 	const std::vector<std::unique_ptr<BotTank>>& getBots() const { return bots; }
 	const std::vector<Projectile>& getProjectiles() const { return projectiles; }
 	const std::vector<Wall>& getWalls() const { return walls; }
-
+	void playerFire();
 	void checkCollisions(const std::vector<Tank*>& tanks);
 
 };

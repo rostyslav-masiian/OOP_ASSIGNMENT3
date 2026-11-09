@@ -8,6 +8,8 @@
 #include <memory>
 #include "vector"
 #include "Damageable.h"
+
+
 class Tank : public Damageable
 {
 private:
@@ -22,23 +24,24 @@ private:
 	bool collidesAt(const Vector2D& center, const std::vector<Wall>& walls, const std::vector<const Tank*>& others) const;
 
 protected:
-	void setDirection(const Vector2D& newDirection);
+	
 	void tryMove(const Vector2D& dir, float dt, const std::vector<Wall>& walls,	const std::vector<const Tank*>& others,	const GameMap& gameMap);
 	
 public:
+
 	Tank(Vector2D startPos, float speed, int health);
 	
 	int getSize() const;
 	Vector2D getCenter() const override;
 	Vector2D getDirection() const;
-	bool canFire();
+	bool canFire() const;
 	void setTankCenter(const Vector2D& newCenter);
+	void setDirection(const Vector2D& newDirection);
 	void updateCooldown(float dt);
 	void resetCooldown();
 	BoxCollider getCollider() const;
 	Projectile fire();
 	virtual void update(float dt, const std::vector<Wall>& walls, const GameMap& gameMap, const std::vector<const Tank*>& others, std::vector<Projectile>& projectiles) = 0;
-	virtual void move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap, const std::vector<const Tank*>& others) = 0;
 	virtual ProjectileOwner getProjectileOwner() const = 0;
 	virtual ~Tank() = default;
 };

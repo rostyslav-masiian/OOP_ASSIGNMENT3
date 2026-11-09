@@ -1,9 +1,9 @@
 #include "BotTank.h"
+#include "BotBehaviour.h"
+
 
 BotTank::BotTank(Vector2D startPos, float speed, int health)
     : Tank(startPos, speed, health) {}
-
-BotState BotTank::getBotState() const { return botState; }
 
 void BotTank::setTarget(const Tank* newTarget) { target = newTarget; }
 
@@ -54,7 +54,7 @@ bool BotTank::isSegmentIntersectingBox(const Vector2D& p1, const Vector2D& p2, c
 }
 
 
-bool BotTank::hasLineOfSight(const Vector2D& botPos, const Vector2D& playerPos, const std::vector<Wall>& walls)
+bool BotTank::hasLineOfSight(const Vector2D& botPos, const Vector2D& playerPos, const std::vector<Wall>& walls) const
 {
     for (const auto& wall : walls)
     {
@@ -66,74 +66,57 @@ bool BotTank::hasLineOfSight(const Vector2D& botPos, const Vector2D& playerPos, 
     return true;
 }
 
+void BotTank::setBehaviour(std::unique_ptr<BotBehaviour> newBotBehaviour) { botBehaviour = std::move(newBotBehaviour);  }
 
-static Vector2D getRandomDirection()
+void BotTank::moveInCurrentDirection(float dt, const std::vector<Wall>& walls, const GameMap& gameMap, const std::vector<const Tank*>& others)
 {
-    static const std::vector<Vector2D> directions = {
-        Vector2D(0.0f, -1.0f), 
-        Vector2D(0.0f, 1.0f), 
-        Vector2D(-1.0f, 0.0f), 
-        Vector2D(1.0f, 0.0f)   
-    };
-
-    
-    std::random_device rd;
-    static std::mt19937 rng{ rd() };
-
-    std::uniform_int_distribution<size_t> dist(0, directions.size() - 1);
-
-    return directions[dist(rng)].normalized();
+    tryMove(getDirection(), dt, walls, others, gameMap);
 }
+
+Vector2D BotTank::getTargetPosition() const 
+{ 
+    if (!target)
+    {
+        return Vector2D(0, 0);
+    }
+    return target->getCenter();
+}
+
+void BotTank::requestFire() { wantToFire = true; }
 
 void BotTank::update(float dt, const std::vector<Wall>& walls, const GameMap& gameMap, const std::vector<const Tank*>& others, std::vector<Projectile>& projectiles)
 {
     if (!isAlive()) return;
 
     updateCooldown(dt);
+    wantToFire = false;
 
-    const float visionRadius = 250.0f;
-    Vector2D toTarget(0.0f, 0.0f);
-    float distance = 0.0f;
-    bool canSeeTarget = false;
-
-    if (target && target->isAlive())
+    if (botBehaviour)
     {
-        toTarget = target->getCenter() - getCenter();
-        distance = toTarget.length();
-        canSeeTarget = distance <= visionRadius &&
-            hasLineOfSight(getCenter(), target->getCenter(), walls);
-    }
-
-    botState = canSeeTarget ? BotState::Chase : BotState::Patrol;
-
-    if (botState == BotState::Chase)
-    {
-        if (distance > 0.001f)
-        {
-            setDirection(toTarget.normalized());
-        }
-        move(dt, walls, gameMap, others);
-
-        if (canFire())
-        {
-            projectiles.push_back(fire());
-        }
+        botBehaviour->update(*this, dt, walls, gameMap, others);
     }
     else
     {
-        patrolTimer -= dt;
-        if (patrolTimer <= 0.0f)
-        {
-            patrolTimer = 2.0f + (rand() % 20) / 10.0f;
-            setDirection(getRandomDirection());
-        }
-        move(dt, walls, gameMap, others);
+        botBehaviour = std::make_unique<PatrolBehaviour>();
+        botBehaviour->update(*this, dt, walls, gameMap, others);
+    }
+
+    if (wantToFire && canFire())
+    {
+        projectiles.push_back(fire());
     }
 }
 
-void BotTank::move(float dt, const std::vector<Wall>& walls, const GameMap& gameMap, const std::vector<const Tank*>& others)
+bool BotTank::canSeeTarget(const std::vector<Wall>& walls) const
 {
-    tryMove(getDirection(), dt, walls, others, gameMap);
+    if (!target || !target->isAlive()) return false;
+
+    const float visionRadius = 250.0f;
+    Vector2D toTarget = target->getCenter() - getCenter();
+
+    if (toTarget.length() > visionRadius) return false;
+
+    return hasLineOfSight(getCenter(), target->getCenter(), walls);
 }
 
  

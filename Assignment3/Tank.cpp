@@ -8,7 +8,7 @@ Tank::Tank(Vector2D startPos, float speed, int health)
 int Tank::getSize() const { return size; }
 Vector2D Tank::getDirection() const { return direction; }
 Vector2D Tank::getCenter() const { return tankCenter; }
-bool Tank::canFire()
+bool Tank::canFire() const
 {
 	return timeSinceLastShot <= 0.0f;
 }

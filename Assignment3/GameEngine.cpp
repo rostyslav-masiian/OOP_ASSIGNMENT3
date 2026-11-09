@@ -1,4 +1,5 @@
 #include "GameEngine.h"
+#include "Command.h"
 
 GameEngine::GameEngine(GameMap map, std::unique_ptr<PlayerTank> playerTank, std::vector<std::unique_ptr<BotTank>> bots, std::vector<Wall> walls)
 	: gameMap(std::move(map)), playerTank(std::move(playerTank)), bots(std::move(bots)), walls(std::move(walls))
@@ -18,7 +19,34 @@ void GameEngine::removeDestroyed()
 
 }
 
+void GameEngine::turnPlayerLeft(float dt)
+{
+	if (getState() != GameState::Running) return;
+	if (playerTank && playerTank->isAlive()) playerTank->turnLeft(dt);
+}
+void GameEngine::turnPlayerRight(float dt)
+{
+	if (getState() != GameState::Running) return;
+	if (playerTank && playerTank->isAlive()) playerTank->turnRight(dt);
 
+}
+void GameEngine::movePlayerForward(float dt)
+{
+	if (getState() != GameState::Running) return;
+	if (!playerTank || !playerTank->isAlive()) return;
+	std::vector<Tank*> tanks = allTanks();
+	std::vector<const Tank*> obstacles(tanks.begin(), tanks.end());
+	playerTank->moveForward(dt, walls, gameMap, obstacles);
+
+}
+
+void GameEngine::playerFire()
+{
+	if (playerTank->canFire())
+	{
+		projectiles.push_back(playerTank->fire());
+	}
+}
 
 bool GameEngine::isOutsideMap(const Projectile& p) const
 {
@@ -51,7 +79,7 @@ void GameEngine::checkCollisions(const std::vector<Tank*>& tanks)
 
 		for (Tank* tank : tanks)
 		{
-			if (tank->getProjectileOwner() == proj.getOwner()) continue;   // свої не б'ють своїх
+			if (tank->getProjectileOwner() == proj.getOwner()) continue;
 
 			if (tank->isAlive() && proj.getCollider().intersects(tank->getCollider()))
 			{
@@ -73,8 +101,13 @@ std::vector<Tank*> GameEngine::allTanks() const
 	return tanks;
 }
 
-void GameEngine::update(float dt, const InputState& input)
+void GameEngine::update(float dt, std::vector<std::unique_ptr<Command>>& commands)
 {
+	for (const auto& cmd : commands)
+	{
+		cmd->execute(*this, dt);
+	}
+	
 	if (getState() != GameState::Running) return;
 
 	for (Projectile& proj : projectiles)
@@ -82,7 +115,6 @@ void GameEngine::update(float dt, const InputState& input)
 		proj.move(dt);
 	}
 
-	if (playerTank) playerTank->setInput(input);
 
 	std::vector<Tank*> tanks = allTanks();
 	std::vector<const Tank*> obstacles(tanks.begin(), tanks.end());

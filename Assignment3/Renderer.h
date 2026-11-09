@@ -16,7 +16,7 @@ private:
     void renderHealthBar(const Tank& tank);
     void renderState(const GameEngine& engine);
 public:
-    Renderer(sf::RenderWindow& win) : window(win) 
+    explicit Renderer(sf::RenderWindow& win) : window(win) 
     {
         if (!tankTexture.loadFromFile("assets/tank.png"))
         {

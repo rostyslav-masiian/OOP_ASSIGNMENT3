@@ -10,7 +10,7 @@ enum class ProjectileOwner
 
 class Projectile : public GameObject
 {
-protected:
+private:
 	int damage = 34;
 	float speed = 200;
 	float radius = 8;
